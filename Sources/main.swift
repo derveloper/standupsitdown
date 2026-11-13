@@ -168,10 +168,19 @@ final class OverlayWindow: NSWindow {
 @MainActor
 final class OverlayController {
     private var windows: [NSWindow] = []
+    /// App that was frontmost before the overlay (e.g. a game). Reactivated on hide so it regains
+    /// focus cleanly and restores its own cursor state instead of being left without a cursor.
+    private var previousApp: NSRunningApplication?
 
     func show(state: AppState) {
+        if windows.isEmpty {
+            let front = NSWorkspace.shared.frontmostApplication
+            previousApp = front?.processIdentifier == ProcessInfo.processInfo.processIdentifier ? nil : front
+        }
         windows.forEach { $0.orderOut(nil) }
         windows = []
+        // A game in mouse-look mode decouples mouse movement from the cursor; re-couple it so the overlay is usable.
+        CGAssociateMouseAndMouseCursorPosition(1)
         NSApp.setActivationPolicy(.regular)
         let primaryScreen = NSScreen.screens.first
         for screen in NSScreen.screens {
@@ -203,6 +212,8 @@ final class OverlayController {
         windows.forEach { $0.orderOut(nil) }
         windows = []
         NSApp.setActivationPolicy(.accessory)
+        if let app = previousApp, !app.isTerminated { app.activate() }
+        previousApp = nil
     }
 }
 
