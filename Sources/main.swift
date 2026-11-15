@@ -81,7 +81,9 @@ final class AppState: ObservableObject {
         now = Date()
         if promptShownAt != nil {
             overlay.reassert()
-        } else if remaining <= 0 {
+        } else if remaining <= 0, NSEvent.pressedMouseButtons == 0 {
+            // Never steal focus while a button is held: WoW (mouse-look) loses its cursor for good
+            // if it is deactivated mid-drag. Show as soon as the button is released.
             showPrompt()
         }
     }
@@ -179,8 +181,6 @@ final class OverlayController {
         }
         windows.forEach { $0.orderOut(nil) }
         windows = []
-        // A game in mouse-look mode decouples mouse movement from the cursor; re-couple it so the overlay is usable.
-        CGAssociateMouseAndMouseCursorPosition(1)
         NSApp.setActivationPolicy(.regular)
         let primaryScreen = NSScreen.screens.first
         for screen in NSScreen.screens {

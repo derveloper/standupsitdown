@@ -17,6 +17,7 @@ SIGN_IDENTITY="Apple Development" ./install.sh   # sign with your own certificat
 - Menu bar: current posture and time left. Click for posture correction, interval (5 to 120 min) and stats for today and the last 7 days.
 - Overlay: pick a posture with a click or keys 1 to 3. Your current posture is disabled. "Geht gerade nicht …" skips until the next interval and records the reason.
 - While the overlay is shown, Cmd-Q, Cmd-Tab, Dock and menu bar are blocked.
+- The overlay waits until no mouse button is held, then returns focus to the previous app when closed. Games such as World of Warcraft lose their cursor if they are deactivated mid mouse-look.
 
 ## Data
 
